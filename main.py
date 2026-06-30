@@ -42,6 +42,25 @@ def build_dependency_graph(python_files: list[Path], project_path: Path) -> dict
     return dependency_graph
 
 
+# Find internal project dependencies
+def find_internal_dependencies(dependency_graph: dict[str, set[str]]) -> dict[str, set[str]]:
+    internal_dependencies = {}
+
+    project_modules = {
+        Path(file).stem
+        for file in dependency_graph
+    }
+
+    for file, imports in dependency_graph.items():
+        internal_dependencies[file] = {
+            module
+            for module in imports
+            if module.split(".")[0] in project_modules
+        }
+
+    return internal_dependencies
+
+
 # Temporary test command to verify CLI works
 @app.command()
 def hello():
@@ -80,19 +99,29 @@ def scan(path: str = typer.Argument(".")):
         project_path
     )
 
-    for file in python_files:
-        print(f"\n{file.relative_to(project_path)}")
+    internal_dependencies = find_internal_dependencies(dependency_graph)
 
-        imports = extract_imports(file)
+    for file, imports in dependency_graph.items():
+        print(f"\n{file}")
 
         if imports:
             print("  Imports:")
-            
             for imp in sorted(imports):
                 print(f"    - {imp}")
         
         else:
             print("  No imports found")
+
+        print("  Internal Dependencies:")
+
+        internal = internal_dependencies[file]
+
+        if internal:
+            for dependency in sorted(internal):
+                print(f"    - {dependency}")
+
+        else:
+            print("    None")
 
 
 if __name__ == "__main__":
