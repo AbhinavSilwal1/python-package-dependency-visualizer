@@ -65,6 +65,38 @@ def find_internal_dependencies(dependency_graph: dict[str, set[str]]) -> dict[st
     return internal_dependencies
 
 
+# Calculate dependency statistics
+def calculate_statistics(
+    dependency_graph: dict[str, set[str]],
+    internal_dependencies: dict[str, set[str]]
+) -> dict[str, float]:
+
+    total_files = len(dependency_graph)
+
+    total_imports = sum(
+        len(imports)
+        for imports in dependency_graph.values()
+    )
+
+    total_internal = sum(
+        len(imports)
+        for imports in internal_dependencies.values()
+    )
+
+    average_imports = (
+        total_imports / total_files
+        if total_files > 0
+        else 0
+    )
+
+    return {
+        "total_files": total_files,
+        "total_imports": total_imports,
+        "total_internal": total_internal,
+        "average_imports": average_imports
+    }
+
+
 # Temporary test command to verify CLI works
 @app.command()
 def hello():
@@ -104,6 +136,7 @@ def scan(path: str = typer.Argument(".")):
     )
 
     internal_dependencies = find_internal_dependencies(dependency_graph)
+    statistics = calculate_statistics(dependency_graph,internal_dependencies)
 
     for file, imports in dependency_graph.items():
         print(f"\n{file}")
@@ -126,6 +159,14 @@ def scan(path: str = typer.Argument(".")):
 
         else:
             print("    None")
+
+    print("\nProject Summary")
+    print("-" * 15)
+
+    print(f"Python files: {statistics['total_files']}")
+    print(f"Total imports: {statistics['total_imports']}")
+    print(f"Internal dependencies: {statistics['total_internal']}")
+    print(f"Average imports per file: {statistics['average_imports']:.1f}")
 
 
 if __name__ == "__main__":
