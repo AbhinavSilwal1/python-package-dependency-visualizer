@@ -6,9 +6,8 @@ import ast
 app = typer.Typer()
 
 
+# Extract import statements from a Python file using AST
 def extract_imports(file_path: Path) -> set[str]:
-    # Extract import statements from a Python file using AST
-
     imports = set()
 
     try:
@@ -32,22 +31,32 @@ def extract_imports(file_path: Path) -> set[str]:
     return imports
 
 
+# Build a dependency graph from Python files
+def build_dependency_graph(python_files: list[Path], project_path: Path) -> dict[str, set[str]]:
+    dependency_graph = {}
+
+    for file in python_files:
+        relative_path = str(file.relative_to(project_path))
+        dependency_graph[relative_path] = extract_imports(file)
+
+    return dependency_graph
+
+
+# Temporary test command to verify CLI works
 @app.command()
 def hello():
-    # Temporary test command to verify CLI works.
     print("Python Package Dependency Visualizer is running 🚀")
 
 
+# Show version of the tool
 @app.command()
 def version():
-    # Show version of the tool.
     print("v0.1.0")
 
 
+# Scan project and extract imports
 @app.command()
 def scan(path: str = typer.Argument(".")):
-    # Scan project and extract imports
-
     project_path = Path(path)
 
     print(f"Scanning project: {project_path.resolve()}\n")
@@ -66,6 +75,11 @@ def scan(path: str = typer.Argument(".")):
 
     print(f"Found {len(python_files)} Python files:\n")
 
+    dependency_graph = build_dependency_graph(
+        python_files,
+        project_path
+    )
+
     for file in python_files:
         print(f"\n{file.relative_to(project_path)}")
 
@@ -73,8 +87,10 @@ def scan(path: str = typer.Argument(".")):
 
         if imports:
             print("  Imports:")
+            
             for imp in sorted(imports):
                 print(f"    - {imp}")
+        
         else:
             print("  No imports found")
 
