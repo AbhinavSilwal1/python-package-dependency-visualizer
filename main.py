@@ -20,10 +20,14 @@ def extract_imports(file_path: Path) -> set[str]:
                 for alias in node.names:
                     imports.add(alias.name)
 
-            # Handle: from x import y
+            # Handle: from x import y and relative imports
             elif isinstance(node, ast.ImportFrom):
-                if node.module:
-                    imports.add(node.module)
+                module = node.module or ""
+
+                if node.level > 0:
+                    module = "." * node.level + module
+
+                imports.add(module)
 
     except Exception as e:
         print(f"Error parsing {file_path}: {e}")
