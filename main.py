@@ -10,6 +10,12 @@ from analyzer import (
 app = typer.Typer()
 
 
+# Python Package Dependency Visualizer
+@app.callback()
+def callback():
+    pass
+
+
 # Scan project and extract imports
 @app.command()
 def scan(path: str = typer.Argument(".")):
