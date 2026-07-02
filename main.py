@@ -1,5 +1,6 @@
 import typer
 from pathlib import Path
+from graph_builder import build_graph
 from analyzer import (
     build_dependency_graph,
     find_internal_dependencies,
@@ -42,6 +43,8 @@ def scan(path: str = typer.Argument(".")):
         project_path
     )
 
+    graph = build_graph(dependency_graph)
+
     internal_dependencies = find_internal_dependencies(dependency_graph)
     statistics = calculate_statistics(dependency_graph,internal_dependencies)
 
@@ -73,6 +76,11 @@ def scan(path: str = typer.Argument(".")):
     print(f"Total imports: {statistics['total_imports']}")
     print(f"Internal dependencies: {statistics['total_internal']}")
     print(f"Average imports per file: {statistics['average_imports']:.1f}")
+
+    print("\nGraph Summary")
+    print("-" * 15)
+    print(f"Nodes: {graph.number_of_nodes()}")
+    print(f"Edges: {graph.number_of_edges()}")
 
 
 if __name__ == "__main__":
