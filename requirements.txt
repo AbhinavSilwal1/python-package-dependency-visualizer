@@ -3,7 +3,9 @@ graphviz==0.21
 markdown-it-py==4.2.0
 mdurl==0.1.2
 networkx==3.6.1
+pydot==4.0.1
 Pygments==2.20.0
+pyparsing==3.3.2
 rich==15.0.0
 shellingham==1.5.4
 typer==0.26.8
