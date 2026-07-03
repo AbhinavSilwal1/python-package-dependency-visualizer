@@ -7,7 +7,8 @@ from analyzer import (
 )
 from graph_builder import (
     build_graph,
-    export_dot
+    export_dot,
+    export_png
 )
 
 
@@ -41,11 +42,7 @@ def scan(path: str = typer.Argument(".")):
 
     print(f"Found {len(python_files)} Python files:\n")
 
-    dependency_graph = build_dependency_graph(
-        python_files,
-        project_path
-    )
-
+    dependency_graph = build_dependency_graph(python_files, project_path)
     internal_dependencies = find_internal_dependencies(dependency_graph)
     statistics = calculate_statistics(dependency_graph,internal_dependencies)
 
@@ -79,7 +76,7 @@ def scan(path: str = typer.Argument(".")):
     print(f"Average imports per file: {statistics['average_imports']:.1f}")
 
 
-# Export dependency graph as a Graphviz DOT file
+# Export dependency graph as a dot or png file
 @app.command()
 def export(path: str = typer.Argument("."), output: str = typer.Argument("dependency_graph.dot")):
     project_path = Path(path)
@@ -107,7 +104,14 @@ def export(path: str = typer.Argument("."), output: str = typer.Argument("depend
     )
 
     graph = build_graph(dependency_graph)
-    export_dot(graph, output_path)
+
+    if output_path.suffix == ".dot":
+        export_dot(graph, output_path)
+    elif output_path.suffix == ".png":
+        export_png(graph, output_path)
+    else:
+        print("Unsupported output format.")
+        raise typer.Exit()
 
     print("\nGraph Summary")
     print("-" * 15)

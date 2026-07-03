@@ -1,5 +1,7 @@
 import networkx as nx
 from networkx.drawing.nx_pydot import write_dot
+import graphviz
+from pathlib import Path
 
 
 # Build a directed graph from dependency data
@@ -22,3 +24,15 @@ def build_graph(dependency_graph: dict[str, set[str]]) -> nx.DiGraph:
 # Export graph to Graphviz DOT format
 def export_dot(graph, output_file: str) -> None:
     write_dot(graph, output_file)
+
+
+# Render graph as a PNG image
+def export_png(graph, output_file: Path) -> None:
+
+    dot = nx.nx_pydot.to_pydot(graph)
+
+    graphviz.Source(dot.to_string()).render(
+        filename=str(output_file.with_suffix("")),
+        format="png",
+        cleanup=True
+    )
