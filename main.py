@@ -81,8 +81,9 @@ def scan(path: str = typer.Argument(".")):
 
 # Export dependency graph as a Graphviz DOT file
 @app.command()
-def export(path: str = typer.Argument(".")):
+def export(path: str = typer.Argument("."), output: str = typer.Argument("dependency_graph.dot")):
     project_path = Path(path)
+    output_path = Path(output).expanduser()
 
     if not project_path.exists():
         print("Path does not exist.")
@@ -102,14 +103,14 @@ def export(path: str = typer.Argument(".")):
     )
 
     graph = build_graph(dependency_graph)
-    export_dot(graph, "dependency_graph.dot")
+    export_dot(graph, output_path)
 
     print("\nGraph Summary")
     print("-" * 15)
     print(f"Nodes: {graph.number_of_nodes()}")
     print(f"Edges: {graph.number_of_edges()}")
-    print("DOT file: dependency_graph.dot")
-    print("\nDependency graph exported successfully!")
+    print(f"DOT file: {output_path}")
+    print(f"\nDependency graph exported to {output_path}")
 
 
 if __name__ == "__main__":
