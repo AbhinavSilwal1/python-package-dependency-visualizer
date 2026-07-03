@@ -116,11 +116,12 @@ def export(path: str = typer.Argument("."), output: str = typer.Argument("depend
     )
 
     graph = build_graph(dependency_graph)
+    cycles = find_cycles(graph)
 
     if output_path.suffix == ".dot":
         export_dot(graph, output_path)
     elif output_path.suffix == ".png":
-        export_png(graph, output_path)
+        export_png(graph, output_path, cycles)
     else:
         print("Unsupported output format.")
         raise typer.Exit()

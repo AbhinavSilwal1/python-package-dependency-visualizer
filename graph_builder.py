@@ -27,9 +27,16 @@ def export_dot(graph, output_file: str) -> None:
 
 
 # Render graph as a PNG image
-def export_png(graph, output_file: Path) -> None:
+def export_png(graph, output_file: Path, cycles: list[list[str]]) -> None:
 
     dot = nx.nx_pydot.to_pydot(graph)
+
+    cycle_edges = set()
+    for cycle in cycles:
+        for i in range(len(cycle)):
+            source = cycle[i]
+            target = cycle[(i + 1) % len(cycle)]
+            cycle_edges.add((source, target))
      
     # Improve graph layout
     dot.set_rankdir("LR")
@@ -50,8 +57,15 @@ def export_png(graph, output_file: Path) -> None:
 
     # Style graph edges
     for edge in dot.get_edges():
-        edge.set_color("gray40")
-        edge.set_penwidth(1.2)
+        source = edge.get_source().strip('"')
+        target = edge.get_destination().strip('"')
+
+        if (source, target) in cycle_edges:
+            edge.set_color("red")
+            edge.set_penwidth(2.5)
+        else:
+            edge.set_color("gray40")
+            edge.set_penwidth(1.2)
 
     graphviz.Source(dot.to_string()).render(
         filename=str(output_file.with_suffix("")),
