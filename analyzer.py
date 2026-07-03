@@ -45,3 +45,10 @@ def calculate_statistics(dependency_graph: dict[str, set[str]], internal_depende
         "total_internal": total_internal,
         "average_imports": average_imports
     }
+
+
+# Find circular dependencies in the graph
+def find_cycles(graph) -> list[list[str]]:
+    import networkx as nx
+
+    return list(nx.simple_cycles(graph))

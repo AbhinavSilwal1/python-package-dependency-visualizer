@@ -3,7 +3,8 @@ from pathlib import Path
 from analyzer import (
     build_dependency_graph,
     find_internal_dependencies,
-    calculate_statistics
+    calculate_statistics,
+    find_cycles
 )
 from graph_builder import (
     build_graph,
@@ -40,9 +41,12 @@ def scan(path: str = typer.Argument(".")):
 
         python_files.append(file)
 
-    print(f"Found {len(python_files)} Python files:\n")
+    print(f"Found {len(python_files)} Python files:")
 
     dependency_graph = build_dependency_graph(python_files, project_path)
+    graph = build_graph(dependency_graph)
+    cycles = find_cycles(graph)
+
     internal_dependencies = find_internal_dependencies(dependency_graph)
     statistics = calculate_statistics(dependency_graph,internal_dependencies)
 
@@ -74,6 +78,14 @@ def scan(path: str = typer.Argument(".")):
     print(f"Total imports: {statistics['total_imports']}")
     print(f"Internal dependencies: {statistics['total_internal']}")
     print(f"Average imports per file: {statistics['average_imports']:.1f}")
+
+    print("\nCircular Dependencies")
+    print("-" * 21)
+    if cycles:
+        for cycle in cycles:
+            print(" -> ".join(cycle + [cycle[0]]))
+    else:
+        print("None")
 
 
 # Export dependency graph as a dot or png file
