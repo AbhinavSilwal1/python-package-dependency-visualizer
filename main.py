@@ -85,6 +85,10 @@ def export(path: str = typer.Argument("."), output: str = typer.Argument("depend
     project_path = Path(path)
     output_path = Path(output).expanduser()
 
+    # Create output directory if it doesn't exist
+    if output_path.parent != Path("."):
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
     if not project_path.exists():
         print("Path does not exist.")
         raise typer.Exit()
