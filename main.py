@@ -11,7 +11,8 @@ from analyzer import (
 from graph_builder import (
     build_graph,
     export_dot,
-    export_png
+    export_png,
+    export_svg
 )
 
 
@@ -121,8 +122,10 @@ def export(
         export_dot(graph, output_path)
     elif output_path.suffix == ".png":
         export_png(graph, output_path, cycles)
+    elif output_path.suffix == ".svg":
+        export_svg(graph, output_path, cycles)
     else:
-        print("Unsupported output format.")
+        print("Unsupported output format. Please use .dot, .png, or .svg.")
         raise typer.Exit()
 
     print("\nGraph Summary")
