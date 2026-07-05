@@ -5,7 +5,8 @@ from analyzer import (
     build_dependency_graph,
     find_internal_dependencies,
     calculate_statistics,
-    find_cycles
+    find_cycles,
+    build_internal_dependency_graph
 )
 from graph_builder import (
     build_graph,
@@ -85,7 +86,15 @@ def scan(path: str = typer.Argument(".")):
 
 # Export dependency graph as a dot or png file
 @app.command()
-def export(path: str = typer.Argument("."), output: str = typer.Argument("dependency_graph.dot")):
+def export(
+    path: str = typer.Argument("."),
+    output: str = typer.Argument("dependency_graph.dot"),
+    internal_only: bool = typer.Option(
+        False,
+        "--internal-only",
+        help="Export only internal project dependencies."
+    )
+):
     project_path = Path(path)
     output_path = Path(output).expanduser()
 
@@ -99,10 +108,11 @@ def export(path: str = typer.Argument("."), output: str = typer.Argument("depend
 
     python_files = collect_python_files(project_path)
 
-    dependency_graph = build_dependency_graph(
-        python_files,
-        project_path
-    )
+    dependency_graph = build_dependency_graph(python_files, project_path)
+    internal_dependencies = find_internal_dependencies(dependency_graph)
+
+    if internal_only:
+        dependency_graph = build_internal_dependency_graph(internal_dependencies)
 
     graph = build_graph(dependency_graph)
     cycles = find_cycles(graph)

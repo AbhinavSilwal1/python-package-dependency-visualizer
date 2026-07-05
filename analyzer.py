@@ -65,3 +65,11 @@ def find_cycles(graph) -> list[list[str]]:
     import networkx as nx
 
     return list(nx.simple_cycles(graph))
+
+
+# Build a dependency graph containing only internal dependencies
+def build_internal_dependency_graph(internal_dependencies: dict[str, set[str]]) -> dict[str, set[str]]:
+    return {
+        file: set(dependencies)
+        for file, dependencies in internal_dependencies.items()
+    }
