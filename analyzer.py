@@ -2,6 +2,19 @@ from pathlib import Path
 from parser import extract_imports
 
 
+# Collect Python source files from a project
+def collect_python_files(project_path: Path) -> list[Path]:
+    python_files = []
+
+    for file in project_path.rglob("*.py"):
+        if ".venv" in file.parts or "__pycache__" in file.parts:
+            continue
+
+        python_files.append(file)
+
+    return python_files
+
+
 # Build a dependency graph from Python files
 def build_dependency_graph(python_files: list[Path], project_path: Path) -> dict[str, set[str]]:
     dependency_graph = {}

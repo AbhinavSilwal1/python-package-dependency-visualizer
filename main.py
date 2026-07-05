@@ -1,6 +1,7 @@
 import typer
 from pathlib import Path
 from analyzer import (
+    collect_python_files,
     build_dependency_graph,
     find_internal_dependencies,
     calculate_statistics,
@@ -33,13 +34,7 @@ def scan(path: str = typer.Argument(".")):
         print("Path does not exist.")
         raise typer.Exit()
 
-    python_files = []
-
-    for file in project_path.rglob("*.py"):
-        if ".venv" in file.parts or "__pycache__" in file.parts:
-            continue
-
-        python_files.append(file)
+    python_files = collect_python_files(project_path)
 
     print(f"Found {len(python_files)} Python files:")
 
@@ -102,13 +97,7 @@ def export(path: str = typer.Argument("."), output: str = typer.Argument("depend
         print("Path does not exist.")
         raise typer.Exit()
 
-    python_files = []
-
-    for file in project_path.rglob("*.py"):
-        if ".venv" in file.parts or "__pycache__" in file.parts:
-            continue
-
-        python_files.append(file)
+    python_files = collect_python_files(project_path)
 
     dependency_graph = build_dependency_graph(
         python_files,
@@ -130,7 +119,7 @@ def export(path: str = typer.Argument("."), output: str = typer.Argument("depend
     print("-" * 15)
     print(f"Nodes: {graph.number_of_nodes()}")
     print(f"Edges: {graph.number_of_edges()}")
-    print(f"DOT file: {output_path}")
+    print(f"Output file: {output_path}")
     print(f"\nDependency graph exported to {output_path}")
 
 
