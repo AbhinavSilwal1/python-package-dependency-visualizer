@@ -73,3 +73,45 @@ def build_internal_dependency_graph(internal_dependencies: dict[str, set[str]]) 
         file: set(dependencies)
         for file, dependencies in internal_dependencies.items()
     }
+
+
+# Find orphan and leaf modules
+def analyze_orphan_and_leaf_modules(
+    dependency_graph: dict[str, set[str]]
+) -> tuple[set[str], set[str]]:
+
+    project_modules = {
+        Path(file).stem: file
+        for file in dependency_graph
+    }
+
+    incoming = {
+        file: set()
+        for file in dependency_graph
+    }
+
+    for file, imports in dependency_graph.items():
+        for module in imports:
+            if module in project_modules:
+                target_file = project_modules[module]
+                incoming[target_file].add(file)
+
+    orphans = {
+        file
+        for file, dependencies in incoming.items()
+        if not dependencies
+    }
+
+    leaf_modules = set()
+
+    for file, imports in dependency_graph.items():
+        internal_imports = {
+            module
+            for module in imports
+            if module in project_modules
+        }
+
+        if not internal_imports:
+            leaf_modules.add(file)
+
+    return orphans, leaf_modules
