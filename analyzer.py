@@ -76,19 +76,9 @@ def build_internal_dependency_graph(internal_dependencies: dict[str, set[str]]) 
 
 
 # Find orphan and leaf modules
-def analyze_orphan_and_leaf_modules(
-    dependency_graph: dict[str, set[str]]
-) -> tuple[set[str], set[str]]:
-
-    project_modules = {
-        Path(file).stem: file
-        for file in dependency_graph
-    }
-
-    incoming = {
-        file: set()
-        for file in dependency_graph
-    }
+def analyze_orphan_and_leaf_modules(dependency_graph: dict[str, set[str]]) -> tuple[set[str], set[str]]:
+    project_modules = {Path(file).stem: file for file in dependency_graph}
+    incoming = {file: set() for file in dependency_graph}
 
     for file, imports in dependency_graph.items():
         for module in imports:
@@ -96,11 +86,7 @@ def analyze_orphan_and_leaf_modules(
                 target_file = project_modules[module]
                 incoming[target_file].add(file)
 
-    orphans = {
-        file
-        for file, dependencies in incoming.items()
-        if not dependencies
-    }
+    orphans = {file for file, dependencies in incoming.items() if not dependencies}
 
     leaf_modules = set()
 
@@ -115,3 +101,26 @@ def analyze_orphan_and_leaf_modules(
             leaf_modules.add(file)
 
     return orphans, leaf_modules
+
+
+# Rank modules by incoming and outgoing dependencies
+def rank_modules(dependency_graph: dict[str, set[str]]) -> tuple[list[tuple[str, int]], list[tuple[str, int]]]:
+
+    project_modules = {Path(file).stem: file for file in dependency_graph}
+    incoming = {file: 0 for file in dependency_graph}
+
+    outgoing = {}
+
+    for file, imports in dependency_graph.items():
+
+        internal_imports = {project_modules[module] for module in imports if module in project_modules}
+
+        outgoing[file] = len(internal_imports)
+
+        for dependency in internal_imports:
+            incoming[dependency] += 1
+
+    most_imported = sorted(incoming.items(), key=lambda item: item[1], reverse=True)
+    most_dependent = sorted(outgoing.items(), key=lambda item: item[1], reverse=True)
+
+    return most_imported, most_dependent

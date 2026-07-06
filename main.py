@@ -7,7 +7,8 @@ from analyzer import (
     calculate_statistics,
     find_cycles,
     build_internal_dependency_graph,
-    analyze_orphan_and_leaf_modules
+    analyze_orphan_and_leaf_modules,
+    rank_modules
 )
 from graph_builder import (
     build_graph,
@@ -45,6 +46,7 @@ def scan(path: str = typer.Argument(".")):
     graph = build_graph(dependency_graph)
     cycles = find_cycles(graph)
     orphans, leaf_nodes = analyze_orphan_and_leaf_modules(dependency_graph)
+    most_imported, most_dependent = rank_modules(dependency_graph)
 
     internal_dependencies = find_internal_dependencies(dependency_graph)
     statistics = calculate_statistics(dependency_graph,internal_dependencies)
@@ -87,7 +89,7 @@ def scan(path: str = typer.Argument(".")):
         print("None")
 
     print("\nOrphan Modules")
-    print("-" * 15)
+    print("-" * 14)
     if orphans:
         for o in sorted(orphans):
             print(f"- {o}")
@@ -95,12 +97,23 @@ def scan(path: str = typer.Argument(".")):
         print("None")
 
     print("\nLeaf Modules")
-    print("-" * 13)
+    print("-" * 12)
     if leaf_nodes:
         for l in sorted(leaf_nodes):
             print(f"- {l}")
     else:
         print("None")
+
+    print("\nDependency Rankings")
+    print("-" * 19)
+    
+    print("Most Imported Modules")
+    for index, (file, count) in enumerate(most_imported, start=1):
+        print(f"{index}. {file} ({count})")
+
+    print("\nMost Dependent Modules")
+    for index, (file, count) in enumerate(most_dependent, start=1):
+        print(f"{index}. {file} ({count})")
 
 
 # Export dependency graph as a dot or png file
