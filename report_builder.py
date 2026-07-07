@@ -12,6 +12,12 @@ from analyzer import (
     rank_modules
 )
 from graph_builder import build_graph
+from config import TOOL_NAME, VERSION
+from datetime import datetime
+
+
+# Show the timestamp of the generated report
+generated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 # Export dependency analysis as a JSON report
@@ -43,6 +49,12 @@ def export_json_report(
     most_imported, most_dependent = rank_modules(dependency_graph)
 
     report = {
+        "report_information": {
+            "tool": TOOL_NAME,
+            "version": VERSION,
+            "generated": generated
+        },
+
         "project_summary": {
             "python_files": statistics["total_files"],
             "total_imports": statistics["total_imports"],
@@ -130,7 +142,7 @@ def export_html_report(
 
     <meta charset="UTF-8">
 
-    <title>Dependency Report</title>
+    <title>{TOOL_NAME} Report</title>
 
     <style>
 
@@ -177,7 +189,19 @@ def export_html_report(
 
     <body>
 
-    <h1>Python Package Dependency Report</h1>
+    <h1>{TOOL_NAME} Report</h1>
+
+    <section>
+
+    <h2>Report Information</h2>
+
+    <ul>
+    <li><strong>Tool:</strong> {TOOL_NAME}</li>
+    <li><strong>Version:</strong> {VERSION}</li>
+    <li><strong>Generated:</strong> {generated}</li>
+    </ul>
+
+    </section>
 
     <section>
 

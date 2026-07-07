@@ -20,12 +20,12 @@ from report_builder import (
     export_json_report,
     export_html_report
 )
-VERSION = "1.0.0"
+from config import CLI_NAME, TOOL_NAME, VERSION
 
 
 app = typer.Typer(
-    name="depviz",
-    help="Python Package Dependency Visualizer"
+    name = CLI_NAME,
+    help = TOOL_NAME
 )
 
 
@@ -38,7 +38,7 @@ def callback():
 # Display DepViz version
 @app.command(help = "Display DepViz version.")
 def version():
-    print(f"DepViz version {VERSION}")
+    print(f"{CLI_NAME} version {VERSION}")
 
 
 # Scan project and extract imports
