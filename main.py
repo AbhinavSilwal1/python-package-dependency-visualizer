@@ -1,5 +1,6 @@
 import typer
 from pathlib import Path
+import json
 from analyzer import (
     collect_python_files,
     build_dependency_graph,
@@ -47,7 +48,6 @@ def scan(path: str = typer.Argument(".")):
     cycles = find_cycles(graph)
     orphans, leaf_nodes = analyze_orphan_and_leaf_modules(dependency_graph)
     most_imported, most_dependent = rank_modules(dependency_graph)
-
     internal_dependencies = find_internal_dependencies(dependency_graph)
     statistics = calculate_statistics(dependency_graph,internal_dependencies)
 
@@ -165,6 +165,86 @@ def export(
     print(f"Edges: {graph.number_of_edges()}")
     print(f"Output file: {output_path}")
     print(f"\nDependency graph exported to {output_path}")
+
+
+# Export dependency analysis as a JSON report
+@app.command()
+def report(
+    path: str = typer.Argument("."),
+    output: str = typer.Argument("dependency_report.json")
+):
+    project_path = Path(path)
+    output_path = Path(output).expanduser()
+
+    if output_path.parent != Path("."):
+        output_path.parent.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+    if not project_path.exists():
+        print("Path does not exist.")
+        raise typer.Exit()
+
+    python_files = collect_python_files(project_path)
+
+    dependency_graph = build_dependency_graph(python_files, project_path)
+    internal_dependencies = find_internal_dependencies(dependency_graph)
+    statistics = calculate_statistics(dependency_graph, internal_dependencies)
+    graph = build_graph(dependency_graph)
+    cycles = find_cycles(graph)
+    orphans, leaf_nodes = analyze_orphan_and_leaf_modules(dependency_graph)
+    most_imported, most_dependent = rank_modules(dependency_graph)
+
+    report = {
+        "project_summary": {
+            "python_files": statistics["total_files"],
+            "total_imports": statistics["total_imports"],
+            "internal_dependencies": statistics["total_internal"],
+            "average_imports": statistics["average_imports"]
+        },
+
+        "dependency_graph": {
+            file: sorted(imports)
+            for file, imports in dependency_graph.items()
+        },
+
+        "internal_dependencies": {
+            file: sorted(imports)
+            for file, imports in internal_dependencies.items()
+        },
+
+        "circular_dependencies": cycles,
+
+        "orphan_modules": sorted(orphans),
+
+        "leaf_modules": sorted(leaf_nodes),
+
+        "most_imported_modules": [
+            {
+                "module": file,
+                "count": count
+            }
+            for file, count in most_imported
+        ],
+
+        "most_dependent_modules": [
+            {
+                "module": file,
+                "count": count
+            }
+            for file, count in most_dependent
+        ]
+    }
+
+    with open(output_path, "w", encoding="utf-8") as file:
+        json.dump(
+            report,
+            file,
+            indent=4
+        )
+
+    print(f"\nJSON report exported to {output_path}")
 
 
 if __name__ == "__main__":
