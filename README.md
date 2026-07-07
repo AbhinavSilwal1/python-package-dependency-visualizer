@@ -63,7 +63,12 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Run the tool:
+Install DepViz as a command-line tool:
+```bash
+pip install .
+```
+
+Verify installation:
 ```bash
 depviz --help
 ```
@@ -105,56 +110,59 @@ depviz scan path/to/project
 Export dependency graphs in different formats.
 
 #### DOT Export
-
-Default DOT graph export:
+Default DOT export:
 ```bash
-depviz export
+depviz export path/to/project filename.dot
 ```
 
-Export DOT graph to a specific file:
+DOT export to a specific location:
 ```bash
-depviz export . filename.dot
-```
-
-Export DOT graph to a specific location:
-```bash
-depviz export . path/to/location/filename.dot
+depviz export path/to/project path/to/location/filename.dot
 ```
 
 #### PNG Export
-
-Export PNG graph to a specific file:
+Default PNG export:
 ```bash
-depviz export . filename.png
+depviz export path/to/project filename.png
 ```
 
-Export PNG graph to a specific location:
+PNG export to a specific location:
 ```bash
-depviz export . path/to/location/filename.png
+depviz export path/to/project path/to/location/filename.png
 ```
 
 #### SVG Export
-
-Export SVG graph to a specific file:
+Default SVG export:
 ```bash
-depviz export . filename.svg
+depviz export path/to/project filename.svg
 ```
 
-Export SVG graph to a specific location:
+SVG export to a specific location:
 ```bash
-depviz export . path/to/location/filename.svg
+depviz export path/to/project path/to/location/filename.svg
 ```
 
 #### Internal Dependency Export
-
-Export Internal Dependency graph to a specific file:
+Default Internal Dependency export:
 ```bash
-depviz export . filename.svg --internal-only
+depviz export path/to/project filename.dot --internal-only
+```
+```bash
+depviz export path/to/project filename.png --internal-only
+```
+```bash
+depviz export path/to/project filename.svg --internal-only
 ```
 
-Export Internal Dependency graph to a specific location:
+Internal Dependency export to a specific location:
 ```bash
-depviz export . path/to/location/filename.svg --internal-only
+depviz export path/to/project path/to/location/filename.dot --internal-only
+```
+```bash
+depviz export path/to/project path/to/location/filename.png --internal-only
+```
+```bash
+depviz export path/to/project path/to/location/filename.svg --internal-only
 ```
 
 <br>
@@ -164,17 +172,12 @@ Generate machine-readable dependency analysis reports.
 
 Default JSON report:
 ```bash
-depviz report-json
-```
-
-Export JSON report to a specific file:
-```bash
-depviz report-json . filename.json
+depviz report-json path/to/project filename.json
 ```
 
 Export JSON report to a specific location:
 ```bash
-depviz report-json . path/to/location/filename.json
+depviz report-json path/to/project path/to/location/filename.json
 ```
 
 <br>
@@ -184,15 +187,10 @@ Generate browser-based dependency analysis reports.
 
 Default HTML report:
 ```bash
-depviz report-html
-```
-
-Export HTML report to a specific file:
-```bash
-depviz report-html . filename.html
+depviz report-html path/to/project filename.html
 ```
 
 Export HTML report to a specific location:
 ```bash
-depviz report-html . path/to/location/filename.html
+depviz report-html path/to/project path/to/location/filename.html
 ```
