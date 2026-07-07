@@ -20,9 +20,13 @@ from report_builder import (
     export_json_report,
     export_html_report
 )
+VERSION = "1.0.0"
 
 
-app = typer.Typer()
+app = typer.Typer(
+    name="depviz",
+    help="Python Package Dependency Visualizer"
+)
 
 
 # Python Package Dependency Visualizer
@@ -31,8 +35,14 @@ def callback():
     pass
 
 
+# Display DepViz version
+@app.command(help = "Display DepViz version.")
+def version():
+    print(f"DepViz version {VERSION}")
+
+
 # Scan project and extract imports
-@app.command()
+@app.command(help = "Analyze Python project dependencies.")
 def scan(path: str = typer.Argument(".")):
     project_path = Path(path)
 
@@ -120,7 +130,7 @@ def scan(path: str = typer.Argument(".")):
 
 
 # Export dependency graph as a dot, png, or svg file
-@app.command()
+@app.command(help = "Export dependency graph visualization.")
 def export(
     path: str = typer.Argument("."),
     output: str = typer.Argument("dependency_graph.dot"),
@@ -171,7 +181,7 @@ def export(
 
 
 # Export dependency analysis as a JSON report
-@app.command()
+@app.command(help = "Generate JSON dependency analysis report.")
 def report_json(
     path: str = typer.Argument("."),
     output: str = typer.Argument("dependency_report.json")
@@ -180,7 +190,7 @@ def report_json(
 
 
 # Export dependency analysis as an HTML report
-@app.command()
+@app.command(help = "Generate HTML dependency analysis report.")
 def report_html(
     path: str = typer.Argument("."),
     output: str = typer.Argument("dependency_report.html")
