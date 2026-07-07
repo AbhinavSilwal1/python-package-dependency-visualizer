@@ -1,13 +1,20 @@
 from pathlib import Path
-from parser import extract_imports
+from .parser import extract_imports
 
 
 # Collect Python source files from a project
 def collect_python_files(project_path: Path) -> list[Path]:
     python_files = []
 
+    ignored_directories = {
+        ".venv",
+        "__pycache__",
+        "build",
+        "dist"
+    }
+
     for file in project_path.rglob("*.py"):
-        if ".venv" in file.parts or "__pycache__" in file.parts:
+        if any(directory in file.parts for directory in ignored_directories):
             continue
 
         python_files.append(file)
@@ -33,9 +40,9 @@ def find_internal_dependencies(dependency_graph: dict[str, set[str]]) -> dict[st
 
     for file, imports in dependency_graph.items():
         internal_dependencies[file] = {
-            module
+            module.lstrip(".")
             for module in imports
-            if module.split(".")[0] in project_modules
+            if module.lstrip(".").split(".")[0] in project_modules
         }
 
     return internal_dependencies
@@ -82,8 +89,10 @@ def analyze_orphan_and_leaf_modules(dependency_graph: dict[str, set[str]]) -> tu
 
     for file, imports in dependency_graph.items():
         for module in imports:
-            if module in project_modules:
-                target_file = project_modules[module]
+            module_name = module.lstrip(".").split(".")[0]
+
+            if module_name in project_modules:
+                target_file = project_modules[module_name]
                 incoming[target_file].add(file)
 
     orphans = {file for file, dependencies in incoming.items() if not dependencies}
@@ -94,7 +103,7 @@ def analyze_orphan_and_leaf_modules(dependency_graph: dict[str, set[str]]) -> tu
         internal_imports = {
             module
             for module in imports
-            if module in project_modules
+            if module.lstrip(".").split(".")[0] in project_modules
         }
 
         if not internal_imports:
@@ -113,7 +122,11 @@ def rank_modules(dependency_graph: dict[str, set[str]]) -> tuple[list[tuple[str,
 
     for file, imports in dependency_graph.items():
 
-        internal_imports = {project_modules[module] for module in imports if module in project_modules}
+        internal_imports = {
+            project_modules[module.lstrip(".").split(".")[0]]
+            for module in imports
+            if module.lstrip(".").split(".")[0] in project_modules
+        }
 
         outgoing[file] = len(internal_imports)
 

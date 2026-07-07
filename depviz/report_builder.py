@@ -2,7 +2,7 @@ import json
 from html import escape
 from pathlib import Path
 import typer
-from analyzer import (
+from .analyzer import (
     collect_python_files,
     build_dependency_graph,
     find_internal_dependencies,
@@ -11,8 +11,8 @@ from analyzer import (
     analyze_orphan_and_leaf_modules,
     rank_modules
 )
-from graph_builder import build_graph
-from config import TOOL_NAME, VERSION
+from .graph_builder import build_graph
+from .config import TOOL_NAME, VERSION
 from datetime import datetime
 
 

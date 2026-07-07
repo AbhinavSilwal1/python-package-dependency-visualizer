@@ -1,6 +1,6 @@
 import typer
 from pathlib import Path
-from analyzer import (
+from .analyzer import (
     collect_python_files,
     build_dependency_graph,
     find_internal_dependencies,
@@ -10,17 +10,17 @@ from analyzer import (
     analyze_orphan_and_leaf_modules,
     rank_modules
 )
-from graph_builder import (
+from .graph_builder import (
     build_graph,
     export_dot,
     export_png,
     export_svg
 )
-from report_builder import (
+from .report_builder import (
     export_json_report,
     export_html_report
 )
-from config import CLI_NAME, TOOL_NAME, VERSION
+from .config import CLI_NAME, TOOL_NAME, VERSION
 
 
 app = typer.Typer(

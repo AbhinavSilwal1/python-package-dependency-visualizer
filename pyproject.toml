@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "depviz"
+version = "1.0.0"
+description = "Python Package Dependency Visualizer"
+dependencies = [
+    "typer==0.26.8",
+    "networkx==3.6.1",
+    "graphviz==0.21",
+    "pydot==4.0.1"
+]
+
+
+[project.scripts]
+depviz = "depviz.main:app"
